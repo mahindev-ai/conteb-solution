@@ -1,0 +1,189 @@
+---
+import { Icon } from "astro-icon/components";
+import ThemeSwitcher from "~/components/theme-switcher.astro";
+import type { NavItem } from "~/types";
+import "@animxyz/core";
+
+const navItems: Array<NavItem> = [
+  { title: "Servicios", url: "#services" },
+  { title: "Testimonios", url: "#testimonials" },
+  { title: "Acompañamiento", url: "#accompaniment" },
+  { title: "Cursos", url: "#courses" },
+];
+---
+
+<header
+  id="page-header"
+  class="absolute bottom-0 z-20 flex w-full items-center justify-between border-b border-transparent px-8 py-4 text-white"
+  xyz="down fade duration-15 delay-2"
+>
+  <a
+    class="xyz-in flex items-center gap-3 hover:!text-default focus:outline-none focus:ring-transparent"
+    href="#"
+  >
+    <span style="display: flex; align-items: center; white-space: nowrap;">
+      Conteb <Icon
+        name="favicon"
+        style="margin-left: 4px; margin-right: 4px;"
+      /> Solution
+    </span>
+  </a>
+
+  <div class="xyz-in">
+    <div class="flex items-center gap-6">
+      <nav class="hidden sm:block">
+        <ul
+          class="flex items-center gap-6 focus:outline-none focus:ring-transparent focus-visible:outline-none"
+        >
+          {
+            navItems.map(({ title, url }) => (
+              <li class="focus:outline-none focus:ring-transparent focus-visible:outline-none">
+                <a
+                  class="text-sm focus:outline-none focus:ring-transparent focus-visible:outline-none"
+                  href={url}
+                >
+                  {title}
+                </a>
+              </li>
+            ))
+          }
+          <li>
+            <a
+              class="inline-flex items-center justify-center gap-2 px-3 py-2 space-x-2 text-sm text-white transition bg-gray-800 border border-gray-600 focus-visible:ring-yellow-500/80 text-md hover:bg-gray-800 hover:border-gray-900 group max-w-fit rounded-xl hover:text-white focus:outline-none focus-visible:outline-none focus-visible:ring focus-visible:ring-white focus-visible:ring-offset-2 active:bg-black"
+              >Diagnostico</a
+            >
+          </li>
+        </ul>
+      </nav>
+      <button
+        id="open-nav-button"
+        type="button"
+        class="btn sm:hidden focus:outline-none focus:ring-transparent focus-visible:outline-none"
+        aria-label="Navigation"
+      >
+        <Icon
+          name="mdi:menu"
+          class="size-8 focus:outline-none focus:ring-transparent focus-visible:outline-none"
+        />
+      </button>
+      <ThemeSwitcher />
+    </div>
+    <div id="menu-modal" class="modal hidden" aria-hidden="true">
+      <div class="fixed inset-0 bg-default px-8 py-4 text-default">
+        <div class="space-y-4" role="dialog" aria-modal="true">
+          <header class="text-right">
+            <button
+              id="close-nav-button"
+              type="button"
+              class="btn focus:outline-none focus:ring-transparent focus-visible:outline-none"
+              aria-label="Close navigation"
+            >
+              <Icon
+                name="mdi:close"
+                class="size-8 focus:outline-none focus:ring-transparent focus-visible:outline-none"
+              />
+            </button>
+          </header>
+          <div
+            class="flex justify-center focus:outline-none focus:ring-transparent focus-visible:outline-none"
+          >
+            <span
+              class="text-xl"
+              style="display: flex; align-items: center; white-space: nowrap;"
+            >
+              Conteb <Icon
+                name="favicon"
+                style="margin-left: 4px; margin-right: 4px;"
+                class="size-8"
+              /> Solution
+            </span>
+          </div>
+          <nav>
+            <ul class="flex flex-col">
+              {
+                navItems.map(({ title, url }) => (
+                  <li>
+                    <a class="block py-4 text-center text-xl" href={url}>
+                      {title}
+                    </a>
+                  </li>
+                ))
+              }
+              <li>
+                <a
+                  class="block py-4 text-center text-xl items-center justify-center gap-2 px-3 space-x-2 text-white transition bg-gray-800 border border-gray-600 focus-visible:ring-yellow-500/80 text-md hover:bg-gray-800 hover:border-gray-900 group max-w-fit rounded-xl hover:text-white focus:outline-none focus-visible:outline-none focus-visible:ring focus-visible:ring-white focus-visible:ring-offset-2 active:bg-black"
+                  style="margin: auto; width: fit-content;"
+                >
+                  Diagnóstico
+                </a>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+<script>
+  import MicroModal from "micromodal";
+  import invariant from "tiny-invariant";
+
+  const menuModalId = "menu-modal";
+
+  const header = document.querySelector("#page-header") as HTMLElement;
+  const page = document.documentElement;
+  const menu = document.querySelector(`#${menuModalId} ul`);
+  const openNavButton = document.querySelector("#open-nav-button");
+  const closeNavButton = document.querySelector("#close-nav-button");
+
+  invariant(header, "header should not be null");
+  invariant(menu, "menu should not be null");
+  invariant(openNavButton, "openNavButton should not be null");
+  invariant(closeNavButton, "closeNavButton should not be null");
+
+  const openMenu = () => {
+    MicroModal.show(menuModalId, { disableScroll: true });
+  };
+
+  const closeMenu = () => {
+    MicroModal.close(menuModalId);
+  };
+
+  openNavButton.addEventListener("click", openMenu);
+  closeNavButton.addEventListener("click", closeMenu);
+
+  document.addEventListener("scroll", () => {
+    const d = page.clientHeight - page.scrollTop - header.offsetHeight;
+    header.classList.toggle("fixed-header", d < 0);
+  });
+
+  menu.addEventListener("click", (event) => {
+    if ((event.target as HTMLElement).tagName === "A") {
+      closeMenu();
+    }
+  });
+</script>
+
+<noscript>
+  <style>
+    #open-nav-button {
+      display: none;
+    }
+  </style>
+</noscript>
+
+<style>
+  .fixed-header {
+    @apply fixed bottom-auto top-0;
+    @apply border-default bg-default text-default;
+  }
+  .modal.is-open {
+    @apply block;
+  }
+  a:focus {
+    outline: none;
+  }
+  a:focus-visible {
+    outline: none;
+  }
+</style>
